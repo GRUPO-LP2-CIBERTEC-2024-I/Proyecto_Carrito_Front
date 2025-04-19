@@ -1,0 +1,39 @@
+.carousel-inner img {
+  width: 100%;
+  height: auto;
+}
+
+.cart-products {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
+}
+
+.logo {
+  width: 120px;
+  height: 70px;
+}
+
+.cart {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.count-product {
+  display: inline-block;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 0 5px;
+  font-size: 14px;
+  position: relative;
+  top: -10px;
+  left: -10px;
+}

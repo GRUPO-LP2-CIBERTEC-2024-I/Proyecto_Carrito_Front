@@ -1,0 +1,68 @@
+/* Contenedor del formulario */
+.form-container {
+  max-width: 450px;
+  width: 100%;
+  padding: 30px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: auto;
+}
+
+/* Título del formulario */
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Campos del formulario */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+/* Botón de registro */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transition: background-color 0.3s;
+}
+
+/* Enlace para cambiar a iniciar sesión */
+.switch-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.switch-link a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.switch-link a:hover {
+  text-decoration: underline;
+}
+
+/* Radios de género */
+.form-check-inline {
+  margin-right: 10px;
+}
+
+.form-check-label {
+  margin-left: 5px;
+}
