@@ -5,7 +5,7 @@ import Header from '../components/Header';
 
 const QuienesSomos: React.FC = () => {
   return (
-    <div>
+    <div className='containerr'>
       <Header />
       <div className="container" style={{ marginTop: '100px' }}>
         <h2 className="text-center" style={{ marginBottom: '70px' }}>¿Quiénes somos?</h2>
@@ -17,7 +17,7 @@ const QuienesSomos: React.FC = () => {
         <h3 className="text-center" style={{ marginBottom: '50px' }}>Desarrolladores</h3>
         <div className="row text-center">
           {[
-            { name: 'Jhon Quiñones', img: '/images/hackersecreto.jpg' },
+            { name: 'Jhon Quiñones', img: '/images/hacker.jpg' },
             { name: 'Cristopher Ortega', img: '/images/hacker.jpg' },
             { name: 'Gianfranco Portillo', img: '/images/hacker.jpg' },
             { name: 'Moises Aguirre', img: '/images/hacker.jpg' },

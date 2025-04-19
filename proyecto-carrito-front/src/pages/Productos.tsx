@@ -5,7 +5,7 @@ import Header from '../components/Header';
 
 const Productos: React.FC = () => {
   return (
-    <div >
+    <div className='containerr'>
       <Header />
       <section className="container">
         <h2 style={{ marginTop: '70px' }}>Todos nuestros productos</h2>

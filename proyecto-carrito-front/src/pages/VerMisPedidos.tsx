@@ -4,7 +4,7 @@ import Header from '../components/Header';
 
 const VerMisPedidos: React.FC = () => {
   return (
-    <div>
+    <div className='containerr'>
       {/* Navbar reutilizable */}
       <Header />
 

@@ -46,7 +46,7 @@ const Comprar: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className='containerr'>
       <Header />
       <div className="container mt-5">
         <div className="row" style={{ marginTop: '100px' }}>

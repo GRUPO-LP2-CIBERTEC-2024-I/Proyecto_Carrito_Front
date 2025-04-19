@@ -4,7 +4,7 @@ import Header from '../components/Header';
 
 const VerDetallesPedido: React.FC = () => {
   return (
-    <div>
+    <div className='containerr'>
       <Header />
       <div className="container mt-5">
         <div className="card" style={{ marginTop: '150px' }}>

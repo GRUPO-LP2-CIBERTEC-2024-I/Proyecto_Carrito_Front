@@ -7,7 +7,7 @@ const Home: React.FC = () => {
   const [isCartVisible, setIsCartVisible] = useState(false); 
 
   return (
-    <div>
+    <div className='containerr'>
       <Header />
 
       <button

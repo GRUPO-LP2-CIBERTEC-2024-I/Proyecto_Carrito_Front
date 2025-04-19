@@ -4,10 +4,10 @@ import Header from '../components/Header';
 
 const VerMiInformacion: React.FC = () => {
   return (
-    <div>
+    <div className='containerr'>
       <Header />
       <div className="container mt-5">
-        <div className="card" style={{ marginTop: '150px' }}>
+        <div className="card">
           <div className="card-header">
             <h3>Información del Usuario</h3>
           </div>
