@@ -14,7 +14,7 @@ const VerMisPedidos: React.FC = () => {
           <div className="card-body">
             <div className="row" style={{ alignItems: 'center' }}>
               <div className="col-md-2">
-                <img src="/assets/products/keyboard-1.jpg" className="img-fluid" alt="Producto" />
+                <img src="https://grupo-lp2-cibertec-2024-i.github.io/proyecto-carrito/imagenes/Teclado%20Mec%C3%A1nico%20Razer%20BlackWidow.JPG" className="img-fluid" alt="Producto" />
               </div>
               <div className="col-md-6">
                 <h5 className="card-title">Teclado Ryzer</h5>

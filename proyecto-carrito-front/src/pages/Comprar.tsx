@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import Footer from '../components/Footer';
-import '../styles/Comprar.css'; 
 import Header from '../components/Header';
+import { useCart } from '../context/CartContext'; // Importa el contexto del carrito
+import '../styles/Comprar.css';
 
 const Comprar: React.FC = () => {
+  const { cartItems, total, clearCart } = useCart(); // Obtén los productos del carrito y el total
   const [direccion, setDireccion] = useState('');
   const [nombreTarjeta, setNombreTarjeta] = useState('');
   const [numeroTarjeta, setNumeroTarjeta] = useState('');
   const [fechaExpiracion, setFechaExpiracion] = useState('');
   const [cvv, setCvv] = useState('');
-  const [subtotal] = useState(0); // Puedes reemplazar con lógica real
-  const [impuestos] = useState(0); // Puedes reemplazar con lógica real
-  const [total] = useState(0); // Puedes reemplazar con lógica real
-  const [mostrarCarrito, setMostrarCarrito] = useState(false);
 
   const confirmarCompra = () => {
     Swal.fire({
@@ -23,6 +21,7 @@ const Comprar: React.FC = () => {
       confirmButtonText: 'OK',
     }).then((result) => {
       if (result.isConfirmed) {
+        clearCart(); // Limpia el carrito después de la compra
         window.location.href = '/';
       }
     });
@@ -46,7 +45,7 @@ const Comprar: React.FC = () => {
   };
 
   return (
-    <div className='containerr'>
+    <div className="containerr">
       <Header />
       <div className="container mt-5">
         <div className="row" style={{ marginTop: '100px' }}>
@@ -142,39 +141,30 @@ const Comprar: React.FC = () => {
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title">Resumen del pedido</h5>
-                <p className="card-text">
-                  Subtotal: <span id="subtotal">S/.{subtotal}</span>
-                </p>
-                <p className="card-text">
-                  Impuestos: <span id="impuestos">S/.{impuestos}</span>
-                </p>
+                {cartItems.map((item) => (
+                  <div key={item.id} className="cart-item">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="cart-item-image"
+                    />
+                    <div className="cart-item-details">
+                      <p>{item.name}</p>
+                      <p>
+                        {item.quantity} x S/.{item.price.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
                 <hr />
                 <h5>
-                  Total: <span id="total">S/.{total}</span>
+                  Total: <span id="total">S/.{total.toFixed(2)}</span>
                 </h5>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Carrito */}
-      {mostrarCarrito && (
-        <div className="cart-products">
-          <p className="close-btn" onClick={() => setMostrarCarrito(false)}>
-            X
-          </p>
-          <h3>Mi carrito</h3>
-          <div className="card-items"></div>
-          <h2>
-            Total: S/.<strong className="price-total">0</strong>
-          </h2>
-          <button className="btn btn-success" id="buy-button" disabled>
-            Comprar
-          </button>
-        </div>
-      )}
-
       <Footer />
     </div>
   );

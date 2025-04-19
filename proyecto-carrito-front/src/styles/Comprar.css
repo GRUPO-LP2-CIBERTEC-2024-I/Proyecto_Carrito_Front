@@ -48,3 +48,56 @@
   max-height: 200px;
   overflow-y: auto;
 }
+
+/* Estilo para los cart-items en el resumen del pedido */
+.cart-item {
+  display: flex;
+  align-items: center; /* Centra verticalmente los elementos */
+  gap: 10px; /* Espacio entre la imagen y los detalles */
+  padding: 10px 0; /* Espaciado interno */
+  border-bottom: 1px solid #ddd; /* Línea divisoria entre los items */
+}
+
+/* Estilo para la imagen del producto */
+.cart-item-image {
+  width: 50px; /* Ancho de la imagen */
+  height: 50px; /* Alto de la imagen */
+  object-fit: cover; /* Ajusta la imagen sin distorsión */
+  border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilo para los detalles del producto */
+.cart-item-details {
+  flex: 1; /* Ocupa el espacio restante */
+  text-align: left; /* Alinea el texto a la izquierda */
+}
+
+/* Estilo para el texto dentro de los cart-items */
+.cart-item p {
+  margin: 0; /* Elimina márgenes adicionales */
+  flex: 1; /* Asegura que los textos se distribuyan uniformemente */
+  text-align: left; /* Alinea el texto a la izquierda */
+}
+
+/* Estilo para el contenedor del resumen */
+.card-body {
+  padding: 20px;
+}
+
+.card-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Diseño responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+  .cart-item {
+    flex-direction: column; /* Cambia la dirección a columna en pantallas pequeñas */
+    align-items: flex-start; /* Alinea los elementos al inicio */
+  }
+
+  .cart-item p {
+    text-align: left; /* Asegura que el texto esté alineado a la izquierda */
+    margin-bottom: 5px; /* Agrega espacio entre los textos */
+  }
+}

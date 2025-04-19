@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/Header.css'; // Asegúrate de tener este archivo para estilos adicionales
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext'; // Importa el contexto del carrito
+import '../styles/Header.css';
 
 const Header: React.FC = () => {
   const [isAccountDropdownVisible, setIsAccountDropdownVisible] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
+  const { cartItems } = useCart(); // Obtén los productos del carrito desde el contexto
+  const navigate = useNavigate(); // Inicializa useNavigate
 
   const toggleAccountDropdown = () => {
     setIsAccountDropdownVisible(!isAccountDropdownVisible);
@@ -12,6 +15,10 @@ const Header: React.FC = () => {
 
   const toggleCart = () => {
     setIsCartVisible(!isCartVisible);
+  };
+  
+  const handleCheckout = () => {
+    navigate('/comprar'); // Redirige a la pantalla de compra
   };
 
   return (
@@ -136,7 +143,7 @@ const Header: React.FC = () => {
               >
                 <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
               </svg>
-              <p className="count-product">0</p>
+              <p className="count-product">{cartItems.length}</p> {/* Muestra la cantidad de productos */}
               <h6 style={{ color: 'white' }}>Carrito</h6>
             </div>
             {isCartVisible && (
@@ -145,11 +152,22 @@ const Header: React.FC = () => {
                   X
                 </p>
                 <h3>Mi carrito</h3>
-                <div className="card-items"></div>
+                <div className="card-items">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="cart-item">
+                      <img src={item.image} alt={item.name} />
+                      <div>
+                        <h5>{item.name}</h5>
+                        <p>Precio: S/.{item.price}</p>
+                        <p>Cantidad: {item.quantity}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <h2>
-                  Total: S/.<strong className="price-total">0</strong>
+                  Total: S/.<strong className="price-total">{cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}</strong>
                 </h2>
-                <button className="btn btn-success" id="buy-button" disabled>
+                <button className="btn btn-success" onClick={handleCheckout} id="buy-button" disabled={cartItems.length === 0}>
                   Comprar
                 </button>
               </div>
