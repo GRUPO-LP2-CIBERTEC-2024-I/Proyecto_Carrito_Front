@@ -38,6 +38,7 @@
 /* Estilo de las cartas del carrito */
 .cart-item {
   display: flex;
+  flex-direction: column; /* Cambia a columna para mejor presentación */
   align-items: center;
   gap: 10px;
   border: 1px solid #ddd;
@@ -45,9 +46,11 @@
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 90%; /* Ajusta el ancho de las cartas */
-  max-width: 300px; /* Máximo ancho para evitar que sean demasiado grandes */
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
 }
+
 
 /* Imagen dentro de las cartas */
 .cart-item img {
@@ -203,3 +206,39 @@
   background-color: #218838;
 }
 
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0.9;
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}

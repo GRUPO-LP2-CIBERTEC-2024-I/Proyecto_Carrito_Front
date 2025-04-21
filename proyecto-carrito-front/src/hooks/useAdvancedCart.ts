@@ -56,7 +56,7 @@ const useAdvancedCart = () => {
     setTotal(0);
   };
 
-  return { cartItems, total, addToCart, removeFromCart, clearCart };
+  return { cartItems, total, addToCart, removeFromCart, clearCart};
 };
 
 export default useAdvancedCart;

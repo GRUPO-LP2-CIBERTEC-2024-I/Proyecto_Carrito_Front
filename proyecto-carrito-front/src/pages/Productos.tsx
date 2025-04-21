@@ -15,6 +15,19 @@ interface Producto {
   imagen: string;
 }
 
+type Categoria = 'Teclados' | 'Impresoras' | 'Monitores' | 'Laptops' | 'Mouses' | 'Consolas';
+
+// 2. Tipa el objeto con ese tipo
+const categorias: Record<Categoria, string[]> = {
+  Teclados: ['teclado', 'keyboard'],
+  Impresoras: ['impresora', 'printer'],
+  Monitores: ['monitor', 'pantalla'],
+  Laptops: ['laptop', 'notebook', 'portátil'],
+  Mouses: ['mouse', 'ratón'],
+  Consolas: ['Consola'],
+};
+
+
 interface PaginationResponse {
   content: Producto[];
   pageable: {
@@ -53,9 +66,20 @@ const Productos: React.FC = () => {
   const [pageSize] = useState(12);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  
-  const { cartItems, total, addToCart, removeFromCart, clearCart } = useCart();
+  const [notification, setNotification] = useState<string | null>(null);
+
+
+  const [allProductos, setAllProductos] = useState<Producto[]>([]);
+  const [nombreFiltro, setNombreFiltro] = useState('');
+  const [precioMax, setPrecioMax] = useState<number | undefined>(undefined);
+  const [precioMin, setPrecioMin] = useState<number | undefined>(undefined);
+
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | "">("");
+
+
+  const {addToCart} = useCart();
   const navigate = useNavigate();
+
 
   const BASE_URL = "/api/Producto/list";
 
@@ -63,15 +87,17 @@ const Productos: React.FC = () => {
     setLoading(true);
     try {
       const url = `${BASE_URL}?page=${page}`;
-  
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Error al obtener los productos: ${response.statusText}`);
       }
-  
+
       const productos = await response.json();
-      
+
+      // Guardamos todos los productos
+      setAllProductos(productos);
+
       const paginatedData: PaginationResponse = {
         content: productos,
         pageable: {
@@ -100,9 +126,8 @@ const Productos: React.FC = () => {
         numberOfElements: Math.min(12, productos.length - page * 12),
         empty: productos.length === 0
       };
-  
+
       setPaginatedData(paginatedData);
-      // Slice el array para mostrar solo los productos de la página actual
       setProductos(productos.slice(page * 12, (page + 1) * 12));
     } catch (err) {
       console.error('Error completo:', err);
@@ -120,6 +145,60 @@ const Productos: React.FC = () => {
   const handleCheckout = () => {
     navigate('/comprar');
   };
+
+  {/* Filtros Logica */}
+  const handleFilter = () => {
+    let filtrados = allProductos;
+
+    if (nombreFiltro.trim() !== '') {
+      filtrados = filtrados.filter(producto =>
+          producto.descripcion.toLowerCase().includes(nombreFiltro.toLowerCase())
+      );
+    }
+
+    if (precioMin !== undefined && !isNaN(precioMin)) {
+      filtrados = filtrados.filter(producto => producto.precioUnidad >= precioMin);
+    }
+
+    if (precioMax !== undefined && !isNaN(precioMax)) {
+      filtrados = filtrados.filter(producto => producto.precioUnidad <= precioMax);
+    }
+    if (categoriaSeleccionada !== "") {
+      const palabrasClave = categorias[categoriaSeleccionada as Categoria]; // Sin error
+      filtrados = filtrados.filter(producto =>
+          palabrasClave.some(palabra =>
+              producto.descripcion.toLowerCase().includes(palabra.toLowerCase())
+          )
+      );
+    }
+
+    const start = currentPage * pageSize;
+    const end = start + pageSize;
+    setProductos(filtrados.slice(start, end));
+
+    setPaginatedData({
+      content: filtrados,
+      pageable: {
+        pageNumber: currentPage,
+        pageSize: pageSize,
+        sort: { empty: true, sorted: false, unsorted: true },
+        offset: start,
+        paged: true,
+        unpaged: false,
+      },
+      last: end >= filtrados.length,
+      totalElements: filtrados.length,
+      totalPages: Math.ceil(filtrados.length / pageSize),
+      size: pageSize,
+      number: currentPage,
+      sort: { empty: true, sorted: false, unsorted: true },
+      first: currentPage === 0,
+      numberOfElements: Math.min(pageSize, filtrados.length - start),
+      empty: filtrados.length === 0,
+    });
+  };
+
+
 
   const goToPage = (page: number) => {
     if (paginatedData && page >= 0 && page < paginatedData.totalPages) {
@@ -139,24 +218,35 @@ const Productos: React.FC = () => {
     }
   };
 
-  // Genera los números de página para la paginación
   const getPageNumbers = () => {
     if (!paginatedData) return [];
-    
+
     const totalPages = paginatedData.totalPages;
     const currentPageNum = paginatedData.number;
     const pages = [];
-    
-    // Muestra máximo 5 números de página
+
     const startPage = Math.max(0, Math.min(currentPageNum - 2, totalPages - 5));
     const endPage = Math.min(totalPages, startPage + 5);
-    
+
     for (let i = startPage; i < endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   };
+
+  const handleAddToCart = (producto: Producto) => {
+    addToCart({
+      id: producto.idProducto,
+      name: producto.descripcion,
+      price: producto.precioUnidad,
+      image: producto.imagen,
+      quantity: 1,
+    });
+    setNotification(`Producto "${producto.descripcion}" agregado al carrito.`); // Muestra la notificación
+    setTimeout(() => setNotification(null), 3000); // Oculta la notificación después de 3 segundos
+  };
+
 
   return (
     <div className="containerr">
@@ -164,9 +254,145 @@ const Productos: React.FC = () => {
       <section className="content-wrap">
         <h2 style={{ marginTop: '70px', marginLeft: '5%' }}>Todos nuestros productos</h2>
         <hr style={{ marginTop: '50px' }} />
-        
+
+        {/* Filtro */}
+        <h2 style={{ marginTop: '70px', marginLeft: '5%', fontSize: '24px', fontWeight: 'bold' }}>Filtrar por...</h2>
+
+        <div style={{
+          display: 'flex',
+          gap: '25px',
+          marginLeft: '5%',
+          marginTop: '20px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'flex-start'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '220px' }}>
+            <label htmlFor="nombreFiltro" style={{
+              marginBottom: '5px',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}>
+              Nombre
+            </label>
+            <input
+                id="nombreFiltro"
+                type="text"
+                placeholder="Nombre del producto"
+                value={nombreFiltro}
+                onChange={(e) => setNombreFiltro(e.target.value)}
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  minWidth: '180px',
+                  fontSize: '16px',
+                  transition: 'border-color 0.3s ease',
+                }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', width: '220px' }}>
+            <label htmlFor="precioMin" style={{
+              marginBottom: '5px',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}>
+              Precio Mínimo
+            </label>
+            <input
+                id="precioMin"
+                type="number"
+                placeholder="Precio mínimo"
+                value={precioMin !== undefined ? precioMin : ''}
+                onChange={(e) => setPrecioMin(e.target.value ? Number(e.target.value) : undefined)}
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  minWidth: '180px',
+                  fontSize: '16px',
+                  transition: 'border-color 0.3s ease',
+                }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', width: '220px' }}>
+            <label htmlFor="precioMax" style={{
+              marginBottom: '5px',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}>
+              Precio Máximo
+            </label>
+            <input
+                id="precioMax"
+                type="number"
+                placeholder="Precio máximo"
+                value={precioMax !== undefined ? precioMax : ''}
+                onChange={(e) => setPrecioMax(e.target.value ? Number(e.target.value) : undefined)}
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  minWidth: '180px',
+                  fontSize: '16px',
+                  transition: 'border-color 0.3s ease',
+                }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', width: '220px' }}>
+            <label htmlFor="categoriaSeleccionada" style={{
+              marginBottom: '5px',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}>
+              Categoría
+            </label>
+            <select
+                id="categoriaSeleccionada"
+                value={categoriaSeleccionada}
+                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                style={{
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #ccc',
+                  minWidth: '180px',
+                  fontSize: '16px',
+                  transition: 'border-color 0.3s ease',
+                }}
+            >
+              <option value="">-- Todos --</option>
+              {Object.keys(categorias).map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+              onClick={handleFilter}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                transition: 'background-color 0.3s ease',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+          >
+            Filtrar
+          </button>
+        </div>
+
+
+        {/* Fetch */}
         {loading && <div className="loading">Cargando productos...</div>}
-        
+
         <div className="products" id="productos-container">
           {error ? (
             <p style={{ color: 'red' }}>Error: {error}</p>
@@ -179,16 +405,8 @@ const Productos: React.FC = () => {
                 </div>
                 <p className="title">{producto.descripcion}</p>
                 <button
-                  className="btn-agregar-carrito"
-                  onClick={() =>
-                    addToCart({
-                      id: producto.idProducto,
-                      name: producto.descripcion,
-                      price: producto.precioUnidad,
-                      image: producto.imagen,
-                      quantity: 1,
-                    })
-                  }
+                    className="btn-agregar-carrito"
+                    onClick={() => handleAddToCart(producto)} // Usar la función para agregar al carrito
                 >
                   Agregar
                 </button>
@@ -198,19 +416,19 @@ const Productos: React.FC = () => {
             !loading && <p>No hay productos disponibles.</p>
           )}
         </div>
-        
+
         {/* Controles de paginación */}
         {paginatedData && paginatedData.totalPages > 1 && (
           <div className="pagination-container">
             <div className="pagination">
-              <button 
-                onClick={prevPage} 
+              <button
+                onClick={prevPage}
                 disabled={paginatedData.first}
                 className={`pagination-button ${paginatedData.first ? 'disabled' : ''}`}
               >
                 &laquo; Anterior
               </button>
-              
+
               {getPageNumbers().map(page => (
                 <button
                   key={page}
@@ -220,51 +438,28 @@ const Productos: React.FC = () => {
                   {page + 1}
                 </button>
               ))}
-              
-              <button 
-                onClick={nextPage} 
+
+              <button
+                onClick={nextPage}
                 disabled={paginatedData.last}
                 className={`pagination-button ${paginatedData.last ? 'disabled' : ''}`}
               >
                 Siguiente &raquo;
               </button>
             </div>
-            
+
             <div className="pagination-info">
               Mostrando {paginatedData.pageable.offset + 1} - {paginatedData.pageable.offset + paginatedData.numberOfElements} de {paginatedData.totalElements} productos
             </div>
           </div>
         )}
-
-        <h3 style={{ marginTop: '3%', marginLeft: '5%' }}>Carrito de Compras</h3>
-
-        <div className="cart-summary">
-          {cartItems.length > 0 ? (
-            <>
-              {cartItems.map((item) => (
-                <div key={item.id} className="cart-item">
-                  <img src={item.image} alt={item.name} />
-                  <div>
-                    <h5>{item.name}</h5>
-                    <p>Precio: S/.{item.price}</p>
-                    <p>Cantidad: {item.quantity}</p>
-                  </div>
-                  <button onClick={() => removeFromCart(item.id)}>Eliminar</button>
-                </div>
-              ))}
-              <h4 className="cart-summary-total">Total: S/.{total.toFixed(2)}</h4>
-              <button className="cart-summary-button" onClick={clearCart}>
-                Vaciar Carrito
-              </button>
-              <button className="cart-summary-button" onClick={handleCheckout} style={{ marginTop: '10px' }}>
-                Comprar
-              </button>
-            </>
-          ) : (
-            <p>El carrito está vacío.</p>
-          )}
-        </div>
       </section>
+      {notification && (
+          <div className="notification">
+            {notification}
+          </div>
+      )}
+
       <Footer />
     </div>
   );

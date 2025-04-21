@@ -6,7 +6,8 @@ import '../styles/Header.css';
 const Header: React.FC = () => {
   const [isAccountDropdownVisible, setIsAccountDropdownVisible] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const { cartItems } = useCart(); // Obtén los productos del carrito desde el contexto
+  const { cartItems, removeFromCart, clearCart, increaseQuantity, decreaseQuantity } = useCart();
+
   const navigate = useNavigate(); // Inicializa useNavigate
 
   const toggleAccountDropdown = () => {
@@ -146,32 +147,66 @@ const Header: React.FC = () => {
               <p className="count-product">{cartItems.length}</p> {/* Muestra la cantidad de productos */}
               <h6 style={{ color: 'white' }}>Carrito</h6>
             </div>
+
             {isCartVisible && (
-              <div className="cart-products" id="products-id">
-                <p className="close-btn" onClick={toggleCart}>
-                  X
-                </p>
-                <h3>Mi carrito</h3>
-                <div className="card-items">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="cart-item">
-                      <img src={item.image} alt={item.name} />
-                      <div>
-                        <h5>{item.name}</h5>
-                        <p>Precio: S/.{item.price}</p>
-                        <p>Cantidad: {item.quantity}</p>
+                <div className="cart-products" id="products-id">
+                  <p className="close-btn" onClick={toggleCart}>X</p>
+                  <h3>Mi carrito</h3>
+                  {cartItems.length > 0 ? (
+                      <>
+                        <div className="card-items" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                          {cartItems.map((item) => (
+                              <div key={item.id} className="cart-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', borderBottom: '1px solid #eee', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', backgroundColor: '#fff' }}>
+                                <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
+                                <div style={{ flex: 1, marginLeft: '15px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                  <h5 style={{ fontSize: '1.2rem', fontWeight: '600' }}>{item.name}</h5>
+                                  <p style={{ fontSize: '1rem', color: '#555' }}>Precio: S/.{item.price}</p>
+                                  <div className="quantity-controls" style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f1f1f1', padding: '6px 12px', borderRadius: '8px', width: 'fit-content', marginTop: '10px' }}>
+                                    <button onClick={() => decreaseQuantity(item.id)} style={{ backgroundColor: '#e74c3c', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '1.2rem', cursor: 'pointer' }}>−</button>
+                                    <span style={{ fontSize: '1.1rem', fontWeight: 'bold', minWidth: '24px', textAlign: 'center' }}>{item.quantity}</span>
+                                    <button onClick={() => increaseQuantity(item.id)} style={{ backgroundColor: '#2ecc71', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '1.2rem', cursor: 'pointer' }}>+</button>
+                                  </div>
+                                </div>
+                                <button className="btn-eliminar" onClick={() => removeFromCart(item.id)} style={{ backgroundColor: '#e74c3c', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer' }}>
+                                  Eliminar
+                                </button>
+                              </div>
+                          ))}
+                        </div>
+                        <h2>
+                          Total: S/.
+                          <strong className="price-total">
+                            {cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
+                          </strong>
+                        </h2>
+
+                        <button
+                            className="btn btn-success"
+                            onClick={handleCheckout}
+                            id="buy-button"
+                            disabled={cartItems.length === 0}
+                        >
+                          Comprar
+                        </button>
+
+                        <button className="btn btn-warning" onClick={clearCart}>
+                          Vaciar Carrito
+                        </button>
+                      </>
+                  ) : (
+                      <div className="carrito-vacio">
+                        <span role="img" aria-label="empty" style={{ fontSize: '2rem' }}>🛒</span>
+                        <p style={{ fontSize: '1.2rem', color: '#666', marginTop: '10px' }}>
+                          ¡Tu carrito está vacío por ahora!
+                        </p>
+                        <p style={{ fontSize: '0.95rem', color: '#999' }}>
+                          Agrega algunos productos y aparecerán aquí.
+                        </p>
                       </div>
-                    </div>
-                  ))}
+                  )}
                 </div>
-                <h2>
-                  Total: S/.<strong className="price-total">{cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}</strong>
-                </h2>
-                <button className="btn btn-success" onClick={handleCheckout} id="buy-button" disabled={cartItems.length === 0}>
-                  Comprar
-                </button>
-              </div>
             )}
+
           </div>
         </div>
       </nav>

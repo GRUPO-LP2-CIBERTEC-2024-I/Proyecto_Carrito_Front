@@ -14,6 +14,8 @@ interface CartContextProps {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
 }
 
 const CartContext = createContext<CartContextProps | undefined>(undefined);
@@ -65,8 +67,37 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setTotal(0);
   };
 
+  const increaseQuantity = (id: string) => {
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      setCartItems(
+          cartItems.map((i) =>
+              i.id === id ? { ...i, quantity: i.quantity + 1 } : i
+          )
+      );
+      setTotal((prevTotal) => prevTotal + item.price);
+    }
+  };
+
+  const decreaseQuantity = (id: string) => {
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      if (item.quantity > 1) {
+        setCartItems(
+            cartItems.map((i) =>
+                i.id === id ? { ...i, quantity: i.quantity - 1 } : i
+            )
+        );
+        setTotal((prevTotal) => prevTotal - item.price);
+      } else {
+        removeFromCart(id); // usa la función que ya tenías para eliminar del todo
+      }
+    }
+  };
+
+
   return (
-    <CartContext.Provider value={{ cartItems, total, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cartItems, total, addToCart, removeFromCart, clearCart, increaseQuantity, decreaseQuantity}}>
       {children}
     </CartContext.Provider>
   );
