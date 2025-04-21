@@ -142,9 +142,6 @@ const Productos: React.FC = () => {
     fetchProductos(currentPage);
   }, [currentPage, pageSize]);
 
-  const handleCheckout = () => {
-    navigate('/comprar');
-  };
 
   {/* Filtros Logica */}
   const handleFilter = () => {
@@ -353,7 +350,7 @@ const Productos: React.FC = () => {
             <select
                 id="categoriaSeleccionada"
                 value={categoriaSeleccionada}
-                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                onChange={(e) => setCategoriaSeleccionada(e.target.value as Categoria | "")}
                 style={{
                   padding: '10px',
                   borderRadius: '8px',
