@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
@@ -78,7 +77,6 @@ const Productos: React.FC = () => {
 
 
   const {addToCart} = useCart();
-  const navigate = useNavigate();
 
 
   const BASE_URL = "/api/Producto/list";
