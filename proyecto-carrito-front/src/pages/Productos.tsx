@@ -86,47 +86,18 @@ const Productos: React.FC = () => {
     try {
       const url = `${BASE_URL}?page=${page}`;
       const response = await fetch(url);
-
+  
       if (!response.ok) {
         throw new Error(`Error al obtener los productos: ${response.statusText}`);
       }
-
-      const productos = await response.json();
-
-      // Guardamos todos los productos
-      setAllProductos(productos);
-
-      const paginatedData: PaginationResponse = {
-        content: productos,
-        pageable: {
-          pageNumber: page,
-          pageSize: 12,
-          sort: {
-            empty: true,
-            unsorted: true,
-            sorted: false
-          },
-          offset: page * 12,
-          paged: true,
-          unpaged: false
-        },
-        last: (page + 1) * 12 >= productos.length,
-        totalElements: productos.length,
-        totalPages: Math.ceil(productos.length / 12),
-        size: 12,
-        number: page,
-        sort: {
-          empty: true,
-          unsorted: true,
-          sorted: false
-        },
-        first: page === 0,
-        numberOfElements: Math.min(12, productos.length - page * 12),
-        empty: productos.length === 0
-      };
-
-      setPaginatedData(paginatedData);
-      setProductos(productos.slice(page * 12, (page + 1) * 12));
+  
+      const data = await response.json();
+  
+      // Ahora data es el objeto paginado completo
+      setPaginatedData(data);
+      setAllProductos(data.content);
+      setProductos(data.content);
+  
     } catch (err) {
       console.error('Error completo:', err);
       const error = err as Error;
