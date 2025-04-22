@@ -1,10 +1,2 @@
-[[redirects]]
-  from = "/api/*"
-  to = "https://backend-ecommerce-t9cg.onrender.com/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+/api/*  https://backend-ecommerce-t9cg.onrender.com/:splat  200
+/*      /index.html   200
