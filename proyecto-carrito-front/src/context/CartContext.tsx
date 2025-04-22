@@ -44,21 +44,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const removeFromCart = (id: string) => {
     const itemToRemove = cartItems.find((item) => item.id === id);
-
+  
     if (itemToRemove) {
-      if (itemToRemove.quantity > 1) {
-        setCartItems(
-          cartItems.map((item) =>
-            item.id === id
-              ? { ...item, quantity: item.quantity - 1 }
-              : item
-          )
-        );
-      } else {
-        setCartItems(cartItems.filter((item) => item.id !== id));
-      }
-
-      setTotal((prevTotal) => prevTotal - itemToRemove.price);
+      // Elimina el producto completamente del carrito
+      setCartItems(cartItems.filter((item) => item.id !== id));
+      
+      // Resta el precio total del producto (precio unitario * cantidad)
+      setTotal((prevTotal) => prevTotal - (itemToRemove.price * itemToRemove.quantity));
     }
   };
 
