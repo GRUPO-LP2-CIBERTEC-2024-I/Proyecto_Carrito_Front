@@ -3,6 +3,8 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
 import '../styles/Productos.css';
+import { useRef } from "react";
+
 
 // Interfaces para tipado
 interface Producto {
@@ -13,19 +15,6 @@ interface Producto {
   precioUnidad: number;
   imagen: string;
 }
-
-type Categoria = 'Teclados' | 'Impresoras' | 'Monitores' | 'Laptops' | 'Mouses' | 'Consolas';
-
-// 2. Tipa el objeto con ese tipo
-const categorias: Record<Categoria, string[]> = {
-  Teclados: ['teclado', 'keyboard'],
-  Impresoras: ['impresora', 'printer'],
-  Monitores: ['monitor', 'pantalla'],
-  Laptops: ['laptop', 'notebook', 'portátil'],
-  Mouses: ['mouse', 'ratón'],
-  Consolas: ['Consola'],
-};
-
 
 interface PaginationResponse {
   content: Producto[];
@@ -66,14 +55,15 @@ const Productos: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const isFiltering = useRef(false);
 
 
   const [allProductos, setAllProductos] = useState<Producto[]>([]);
-  const [nombreFiltro, setNombreFiltro] = useState('');
   const [precioMax, setPrecioMax] = useState<number | undefined>(undefined);
   const [precioMin, setPrecioMin] = useState<number | undefined>(undefined);
+  const [nombreFiltro, setNombreFiltro] = useState<string>('');
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
 
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | "">("");
 
 
   const {addToCart} = useCart();
@@ -81,23 +71,50 @@ const Productos: React.FC = () => {
 
   const BASE_URL = "/api/Producto/list";
 
-  const fetchProductos = async (page = 0) => {
+  const categorias = [
+    "Monitores", "Televisores", "Micrófonos", "Impresoras", "Almacenamiento",
+    "Routers", "Camaras", "Tablets", "Consolas", "Altavoces", "Seguridad", "Teléfonos", "Teclados"
+  ];
+
+
+  const fetchProductos = async (page = currentPage, nombre?: string, categoria?: string) => {
     setLoading(true);
     try {
-      const url = `${BASE_URL}?page=${page}`;
+      let url = `${BASE_URL}?page=${page}`;
+
+      if (nombre) {
+        url += `&nombre=${nombre}`;
+      }
+
+      if (categoria) {
+        url += `&categoria=${categoria}`;
+      }
+
       const response = await fetch(url);
-  
+
       if (!response.ok) {
         throw new Error(`Error al obtener los productos: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
-  
-      // Ahora data es el objeto paginado completo
+
       setPaginatedData(data);
       setAllProductos(data.content);
-      setProductos(data.content);
-  
+
+      let productosFiltrados = data.content;
+
+      if (precioMin !== undefined) {
+        productosFiltrados = productosFiltrados.filter((p: { precioUnidad: number; }) => p.precioUnidad >= precioMin);
+      }
+
+      if (precioMax !== undefined) {
+        productosFiltrados = productosFiltrados.filter((p: { precioUnidad: number; }) => p.precioUnidad <= precioMax);
+      }
+
+      setProductos(productosFiltrados);
+
+
+
     } catch (err) {
       console.error('Error completo:', err);
       const error = err as Error;
@@ -108,62 +125,20 @@ const Productos: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchProductos(currentPage);
-  }, [currentPage, pageSize]);
+    const filtrar = async () => {
+      isFiltering.current = true;
+      await fetchProductos(currentPage, nombreFiltro, categoriaSeleccionada);
+      isFiltering.current = false;
+    };
 
+    filtrar();
+  }, [currentPage]);
 
-  {/* Filtros Logica */}
   const handleFilter = () => {
-    let filtrados = allProductos;
-
-    if (nombreFiltro.trim() !== '') {
-      filtrados = filtrados.filter(producto =>
-          producto.descripcion.toLowerCase().includes(nombreFiltro.toLowerCase())
-      );
-    }
-
-    if (precioMin !== undefined && !isNaN(precioMin)) {
-      filtrados = filtrados.filter(producto => producto.precioUnidad >= precioMin);
-    }
-
-    if (precioMax !== undefined && !isNaN(precioMax)) {
-      filtrados = filtrados.filter(producto => producto.precioUnidad <= precioMax);
-    }
-    if (categoriaSeleccionada !== "") {
-      const palabrasClave = categorias[categoriaSeleccionada as Categoria]; // Sin error
-      filtrados = filtrados.filter(producto =>
-          palabrasClave.some(palabra =>
-              producto.descripcion.toLowerCase().includes(palabra.toLowerCase())
-          )
-      );
-    }
-
-    const start = currentPage * pageSize;
-    const end = start + pageSize;
-    setProductos(filtrados.slice(start, end));
-
-    setPaginatedData({
-      content: filtrados,
-      pageable: {
-        pageNumber: currentPage,
-        pageSize: pageSize,
-        sort: { empty: true, sorted: false, unsorted: true },
-        offset: start,
-        paged: true,
-        unpaged: false,
-      },
-      last: end >= filtrados.length,
-      totalElements: filtrados.length,
-      totalPages: Math.ceil(filtrados.length / pageSize),
-      size: pageSize,
-      number: currentPage,
-      sort: { empty: true, sorted: false, unsorted: true },
-      first: currentPage === 0,
-      numberOfElements: Math.min(pageSize, filtrados.length - start),
-      empty: filtrados.length === 0,
-    });
+    isFiltering.current = true;
+    setCurrentPage(0);
+    fetchProductos(0, nombreFiltro, categoriaSeleccionada);
   };
-
 
 
   const goToPage = (page: number) => {
@@ -209,8 +184,8 @@ const Productos: React.FC = () => {
       image: producto.imagen,
       quantity: 1,
     });
-    setNotification(`Producto "${producto.descripcion}" agregado al carrito.`); // Muestra la notificación
-    setTimeout(() => setNotification(null), 3000); // Oculta la notificación después de 3 segundos
+    setNotification(`Producto "${producto.descripcion}" agregado al carrito.`);
+    setTimeout(() => setNotification(null), 3000);
   };
 
 
@@ -319,7 +294,7 @@ const Productos: React.FC = () => {
             <select
                 id="categoriaSeleccionada"
                 value={categoriaSeleccionada}
-                onChange={(e) => setCategoriaSeleccionada(e.target.value as Categoria | "")}
+                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
                 style={{
                   padding: '10px',
                   borderRadius: '8px',
@@ -330,8 +305,8 @@ const Productos: React.FC = () => {
                 }}
             >
               <option value="">-- Todos --</option>
-              {Object.keys(categorias).map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+              {categorias.map((categoria) => (
+                  <option key={categoria} value={categoria}>{categoria}</option>
               ))}
             </select>
           </div>
