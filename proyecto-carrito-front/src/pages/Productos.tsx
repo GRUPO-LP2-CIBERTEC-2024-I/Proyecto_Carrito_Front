@@ -51,14 +51,13 @@ const Productos: React.FC = () => {
   const [paginatedData, setPaginatedData] = useState<PaginationResponse | null>(null);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(12);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const isFiltering = useRef(false);
 
 
-  const [allProductos, setAllProductos] = useState<Producto[]>([]);
+  const [, setAllProductos] = useState<Producto[]>([]);
   const [precioMax, setPrecioMax] = useState<number | undefined>(undefined);
   const [precioMin, setPrecioMin] = useState<number | undefined>(undefined);
   const [nombreFiltro, setNombreFiltro] = useState<string>('');
