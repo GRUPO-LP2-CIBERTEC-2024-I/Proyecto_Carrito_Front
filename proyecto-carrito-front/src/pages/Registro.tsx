@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Registro.css';
 
-const Registro: React.FC = () => {
+consRegistro: React.FC = () => {
   const [formData, setFormData] = useState({
     idCliente: 0,
     firstName: '',
