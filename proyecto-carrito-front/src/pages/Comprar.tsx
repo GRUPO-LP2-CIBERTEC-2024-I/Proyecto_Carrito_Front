@@ -11,10 +11,10 @@ import '../styles/Comprar.css';
 const Comprar: React.FC = () => {
   const { cartItems, total, clearCart } = useCart(); // Obtén los productos del carrito y el total
   const [direccion, setDireccion] = useState('');
-  const [nombreTarjeta, setNombreTarjeta] = useState('');
-  const [numeroTarjeta, setNumeroTarjeta] = useState('');
-  const [fechaExpiracion, setFechaExpiracion] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [distrito, setDistrito] = useState('');
+  const [nombreReceptor, setNombreReceptor] = useState('');
+  const [referencia, setReferencia] = useState('');
+  const [telefono, setTelefono] = useState('');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
@@ -42,11 +42,11 @@ const Comprar: React.FC = () => {
         producto: item.id, // ID del producto en el carrito
       })),
       pedidoDTO: {
-        distrito: "Lima", // Datos fijos por ahora
-        direccion: "av Carlos Izaguirre",
-        referencia: "frente a cibertec",
-        nombreReceptor: "Estefania",
-        telefono: "981938493",
+        distrito: distrito, 
+        direccion: direccion, 
+        referencia: referencia, 
+        nombreReceptor: nombreReceptor,
+        telefono: telefono, 
       },
     };
 
@@ -58,7 +58,7 @@ const Comprar: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", 
+          credentials: "include",
           body: JSON.stringify(body),
         }
       );
@@ -122,7 +122,7 @@ const Comprar: React.FC = () => {
             <form>
               <div className="mb-3">
                 <label htmlFor="direccion" className="form-label">
-                  Dirección de envío
+                  Dirección
                 </label>
                 <input
                   type="text"
@@ -134,55 +134,54 @@ const Comprar: React.FC = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="nombre-tarjeta" className="form-label">
-                  Nombre en la tarjeta
+                <label htmlFor="distrito" className="form-label">
+                  Distrito
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="nombre-tarjeta"
-                  value={nombreTarjeta}
-                  onChange={(e) => setNombreTarjeta(e.target.value)}
+                  id="distrito"
+                  value={distrito}
+                  onChange={(e) => setDistrito(e.target.value)}
                   required
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="numero-tarjeta" className="form-label">
-                  Número de tarjeta
+                <label htmlFor="nombre-receptor" className="form-label">
+                  Nombre del Receptor
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="numero-tarjeta"
-                  value={numeroTarjeta}
-                  onChange={(e) => setNumeroTarjeta(e.target.value)}
+                  id="nombre-receptor"
+                  value={nombreReceptor}
+                  onChange={(e) => setNombreReceptor(e.target.value)}
                   required
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="fecha-expiracion" className="form-label">
-                  Fecha de expiración
+                <label htmlFor="referencia" className="form-label">
+                  Referencia
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="fecha-expiracion"
-                  placeholder="MM/AA"
-                  value={fechaExpiracion}
-                  onChange={(e) => setFechaExpiracion(e.target.value)}
+                  id="referencia"
+                  value={referencia}
+                  onChange={(e) => setReferencia(e.target.value)}
                   required
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="cvv" className="form-label">
-                  CVV
+                <label htmlFor="telefono" className="form-label">
+                  Teléfono
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="cvv"
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value)}
+                  id="telefono"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
                   required
                 />
               </div>
