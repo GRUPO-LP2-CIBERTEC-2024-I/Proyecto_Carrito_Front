@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import '../styles/Registro.css'; // Mueve los estilos en línea a este archivo
+import '../styles/Registro.css';
 
-const Registro: React.FC = () => {
+consRegistro: React.FC = () => {
   const [formData, setFormData] = useState({
+    idCliente: 0,
     firstName: '',
     lastName: '',
     address: '',
     birthDate: '',
     gender: '',
+    dni: '',
+    telefono: '',
     email: '',
     password: '',
     termsAccepted: false,
@@ -21,147 +24,115 @@ const Registro: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log('Datos del formulario:', formData);
-    // Aquí puedes agregar la lógica para enviar los datos al servidor
+  const handleSubmit = async () => {
+    // Validación básica antes del envío
+    if (!formData.termsAccepted) {
+      alert('Debes aceptar los términos y condiciones.');
+      return;
+    }
+
+    const generatedId = Math.floor(Math.random() * 1000000);
+
+    const cliente = {
+      idCliente: generatedId,
+      nombres: formData.firstName,
+      apellidos: formData.lastName,
+      direccion: formData.address,
+      fechaNacimiento: formData.birthDate,
+      sexo: formData.gender === 'male' ? 'M' : 'F',
+      dni: formData.dni,
+      telefono: formData.telefono,
+      correo: formData.email,
+      password: formData.password,
+    };
+
+    try {
+      const response = await fetch('https://backend-ecommerce-t9cg.onrender.com/Cliente/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cliente),
+      });
+
+      if (response.ok) {
+        alert('Registro exitoso');
+        setFormData({
+          idCliente: 0,
+          firstName: '',
+          lastName: '',
+          address: '',
+          birthDate: '',
+          gender: '',
+          dni: '',
+          telefono: '',
+          email: '',
+          password: '',
+          termsAccepted: false,
+        });
+      } else {
+        const errorData = await response.json();
+        alert('Error en el registro: ' + errorData.message);
+      }
+    } catch (error) {
+      alert('Error de red: ' + error);
+    }
   };
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">Registrarse</h2>
-      <form>
-        <div className="form-group">
-          <label htmlFor="firstName">Nombres</label>
-          <input
-            type="text"
-            className="form-control"
-            id="firstName"
-            name="firstName"
-            placeholder="Nombres"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastName">Apellidos</label>
-          <input
-            type="text"
-            className="form-control"
-            id="lastName"
-            name="lastName"
-            placeholder="Apellidos"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="address">Dirección</label>
-          <input
-            type="text"
-            className="form-control"
-            id="address"
-            name="address"
-            placeholder="Dirección"
-            value={formData.address}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="birthDate">Fecha de Nacimiento</label>
-          <input
-            type="date"
-            className="form-control"
-            id="birthDate"
-            name="birthDate"
-            value={formData.birthDate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Género</label>
-          <div className="form-check form-check-inline">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="gender"
-              id="male"
-              value="male"
-              checked={formData.gender === 'male'}
-              onChange={handleChange}
-              required
-            />
-            <label className="form-check-label" htmlFor="male">
-              Masculino
-            </label>
+      <div className="form-container">
+        <h2 className="form-title">Registrarse</h2>
+        <form>
+          <div className="form-group">
+            <label htmlFor="firstName">Nombres</label>
+            <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} required />
           </div>
-          <div className="form-check form-check-inline">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="gender"
-              id="female"
-              value="female"
-              checked={formData.gender === 'female'}
-              onChange={handleChange}
-              required
-            />
-            <label className="form-check-label" htmlFor="female">
-              Femenino
-            </label>
+          <div className="form-group">
+            <label htmlFor="lastName">Apellidos</label>
+            <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} required />
           </div>
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Correo electrónico</label>
-          <input
-            type="email"
-            className="form-control"
-            id="email"
-            name="email"
-            placeholder="Correo electrónico"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            name="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="terms"
-            name="termsAccepted"
-            checked={formData.termsAccepted}
-            onChange={handleChange}
-            required
-          />
-          <label className="form-check-label" htmlFor="terms">
-            Acepto los términos y condiciones
-          </label>
-        </div>
-        <button type="button" className="btn btn-primary btn-block" onClick={handleSubmit}>
-          Registrarse
-        </button>
-        <p className="switch-link">
-          Ya tengo una cuenta <a href="/login">Iniciar sesión</a>
-        </p>
-      </form>
-    </div>
+          <div className="form-group">
+            <label htmlFor="address">Dirección</label>
+            <input type="text" name="address" className="form-control" value={formData.address} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="birthDate">Fecha de Nacimiento</label>
+            <input type="date" name="birthDate" className="form-control" value={formData.birthDate} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Género</label>
+            <div>
+              <label>
+                <input type="radio" name="gender" value="male" checked={formData.gender === 'male'} onChange={handleChange} /> Masculino
+              </label>
+              <label>
+                <input type="radio" name="gender" value="female" checked={formData.gender === 'female'} onChange={handleChange} /> Femenino
+              </label>
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="dni">DNI</label>
+            <input type="text" name="dni" className="form-control" value={formData.dni} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="telefono">Teléfono</label>
+            <input type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Correo electrónico</label>
+            <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Contraseña</label>
+            <input type="password" name="password" className="form-control" value={formData.password} onChange={handleChange} required />
+          </div>
+          <div className="form-group form-check">
+            <input type="checkbox" name="termsAccepted" checked={formData.termsAccepted} onChange={handleChange} />
+            <label>Acepto los términos y condiciones</label>
+          </div>
+          <button type="button" onClick={handleSubmit} className="btn btn-primary">Registrarse</button>
+        </form>
+      </div>
   );
 };
 
