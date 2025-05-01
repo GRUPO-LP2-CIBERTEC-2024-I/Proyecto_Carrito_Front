@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
 
 const Login: React.FC = () => {
@@ -7,16 +8,18 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     setError(''); // Limpiar error anterior
 
     try {
-      const response = await fetch('https://backend-ecommerce-t9cg.onrender.com/login', {
+      const response = await fetch('http://localhost:8081/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: email,
           password: password
@@ -25,11 +28,12 @@ const Login: React.FC = () => {
 
       if (response.ok) {
         // Puedes guardar el token aquí si el backend lo devuelve
+        login(email);
         navigate('/'); // Redirigir al Home
       } else {
         setError('Correo o contraseña incorrectos');
       }
-    } catch (err) {
+    } catch {
       setError('Error al conectar con el servidor');
     }
   };

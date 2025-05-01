@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useCart } from '../context/CartContext'; // Importa el contexto del carrito
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 import '../styles/Comprar.css';
 
 const Comprar: React.FC = () => {
@@ -12,8 +15,23 @@ const Comprar: React.FC = () => {
   const [numeroTarjeta, setNumeroTarjeta] = useState('');
   const [fechaExpiracion, setFechaExpiracion] = useState('');
   const [cvv, setCvv] = useState('');
-
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAuthenticated) {
+      Swal.fire({
+        title: "Acceso denegado",
+        text: "Debes iniciar sesión para realizar una compra",
+        icon: "warning",
+        confirmButtonText: "OK"
+      });
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
   const confirmarCompra = async () => {
+    if (!isAuthenticated) {
+      return;
+    }
     const body = {
       ventaDTO: {
         fechaVenta: "12/05/24", // Fecha fija por ahora
