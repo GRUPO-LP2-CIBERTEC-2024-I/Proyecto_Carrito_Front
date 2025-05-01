@@ -13,8 +13,7 @@ const Comprar: React.FC = () => {
   const [fechaExpiracion, setFechaExpiracion] = useState('');
   const [cvv, setCvv] = useState('');
 
-    const confirmarCompra = async () => {
-    // Construir el cuerpo de la solicitud
+  const confirmarCompra = async () => {
     const body = {
       ventaDTO: {
         fechaVenta: "12/05/24", // Fecha fija por ahora
@@ -32,9 +31,8 @@ const Comprar: React.FC = () => {
         telefono: "981938493",
       },
     };
-  
+
     try {
-      // Llamar al endpoint
       const response = await fetch(
         "https://backend-ecommerce-t9cg.onrender.com/pago/crear-preferencia",
         {
@@ -45,26 +43,27 @@ const Comprar: React.FC = () => {
           body: JSON.stringify(body),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error(`Error en la solicitud: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
       console.log("Respuesta del servidor:", data);
-  
-      // Mostrar mensaje de éxito
-      Swal.fire({
-        title: "¡Tu compra ha sido realizada con éxito!",
-        text: "Estaremos informándote de tu pedido.",
-        icon: "success",
-        confirmButtonText: "OK",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          clearCart(); // Limpia el carrito después de la compra
-          window.location.href = "/";
-        }
-      });
+
+      if (data.init_point) {
+        clearCart(); // Limpiar el carrito después de la compra
+        Swal.fire({
+          title: "Compra exitosa",
+          text: "Tu compra ha sido procesada con éxito.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        // Redirigir al enlace de MercadoPago
+        window.location.href = data.init_point;
+      } else {
+        throw new Error("No se recibió el enlace de redirección.");
+      }
     } catch (error) {
       console.error("Error al realizar la compra:", error);
       Swal.fire({
