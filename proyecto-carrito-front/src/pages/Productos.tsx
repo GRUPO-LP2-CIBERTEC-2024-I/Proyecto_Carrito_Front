@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
 import '../styles/Productos.css';
 import { useRef } from "react";
-import { apiFetch, publicFetch } from '../api';
+import {  publicFetch } from '../api';
 
 
 // Interfaces para tipado
