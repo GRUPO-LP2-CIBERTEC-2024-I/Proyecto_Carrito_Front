@@ -3,19 +3,30 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { apiFetch } from '../api'; // Asegúrate de que esta ruta sea correcta
 
+// Definimos una interfaz para tipar cada venta correctamente
+interface Venta {
+    idVenta: number;
+    monto: number;
+    fechaVenta: string;
+    pago: never;       // Puedes reemplazar con un tipo específico si sabes su estructura
+    pedido: never;     // Igual aquí
+    detalles: never[]; // Y aquí también
+    paymentId: string | null;
+}
+
 const VerMisPedidos: React.FC = () => {
-    const [ventas, setVentas] = useState<any[]>([]);
+    const [ventas, setVentas] = useState<Venta[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPedidos = async () => {
             try {
-                const data = await apiFetch('/api/Venta/mis-ventas', {
+                const data: Venta[] = await apiFetch('/api/Venta/mis-ventas', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include'
+                    credentials: 'include',
                 });
 
                 if (Array.isArray(data)) {
@@ -24,7 +35,6 @@ const VerMisPedidos: React.FC = () => {
                 } else {
                     alert('La respuesta no es una lista');
                 }
-
             } catch (error) {
                 setError('Error al cargar las ventas');
                 console.error(error);
@@ -35,7 +45,7 @@ const VerMisPedidos: React.FC = () => {
     }, []);
 
     return (
-        <div className='containerr'>
+        <div className="containerr">
             <Header />
             <div className="container mt-5">
                 <h2 style={{ marginBottom: '50px', marginTop: '100px' }}>Mis Pedidos</h2>
