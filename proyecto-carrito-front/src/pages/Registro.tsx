@@ -2,80 +2,87 @@ import React, { useState } from 'react';
 import '../styles/Registro.css';
 
 const Registro: React.FC = () => {
-  const [formData, setFormData] = useState({
-    idCliente: 0,
-    firstName: '',
-    lastName: '',
-    address: '',
-    birthDate: '',
-    gender: '',
+  const [cliente, setCliente] = useState({
+    IdCliente: null,
+    Nombres: '',
+    Apellidos: '',
+    Direccion: '',
+    FechaNacimiento: '',
+    Sexo: '',
     dni: '',
     telefono: '',
-    email: '',
-    password: '',
+    correo: '',
+    Password: '',
     termsAccepted: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setCliente({
+      ...cliente,
       [name]: type === 'checkbox' ? checked : value,
     });
   };
 
   const handleSubmit = async () => {
-    // Validación básica antes del envío
-    if (!formData.termsAccepted) {
+    if (!cliente.termsAccepted) {
       alert('Debes aceptar los términos y condiciones.');
       return;
     }
 
-    const generatedId = Math.floor(Math.random() * 1000000);
-
-    const cliente = {
-      idCliente: generatedId,
-      nombres: formData.firstName,
-      apellidos: formData.lastName,
-      direccion: formData.address,
-      fechaNacimiento: formData.birthDate,
-      sexo: formData.gender === 'male' ? 'M' : 'F',
-      dni: formData.dni,
-      telefono: formData.telefono,
-      correo: formData.email,
-      password: formData.password,
+    const payload = {
+      idCliente: 0,
+      nombres: cliente.Nombres,
+      apellidos: cliente.Apellidos,
+      direccion: cliente.Direccion,
+      fechaNacimiento: cliente.FechaNacimiento,
+      sexo: cliente.Sexo === 'male' ? 'm' : 'f',
+      dni: cliente.dni,
+      telefono: cliente.telefono,
+      correo: cliente.correo,
+      password: cliente.Password,
+      estado: "A"
     };
 
     try {
-      const response = await fetch('https://backend-ecommerce-t9cg.onrender.com/Cliente/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(cliente),
-      });
+      const response = await fetch(
+          "https://backend-ecommerce-t9cg.onrender.com/Cliente/add",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+            credentials: "include"
+          }
+      );
 
       if (response.ok) {
         alert('Registro exitoso');
-        setFormData({
-          idCliente: 0,
-          firstName: '',
-          lastName: '',
-          address: '',
-          birthDate: '',
-          gender: '',
+
+        setCliente({
+          IdCliente: null,
+          Nombres: '',
+          Apellidos: '',
+          Direccion: '',
+          FechaNacimiento: '',
+          Sexo: '',
           dni: '',
           telefono: '',
-          email: '',
-          password: '',
+          correo: '',
+          Password: '',
           termsAccepted: false,
         });
       } else {
         const errorData = await response.json();
-        alert('Error en el registro: ' + errorData.message);
+        alert(`Error: ${errorData.message || 'No se pudo registrar'}`);
       }
-    } catch (error) {
-      alert('Error de red: ' + error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(`Error: ${error.message}`);
+      } else {
+        alert('Error desconocido');
+      }
     }
   };
 
@@ -84,50 +91,50 @@ const Registro: React.FC = () => {
         <h2 className="form-title">Registrarse</h2>
         <form>
           <div className="form-group">
-            <label htmlFor="firstName">Nombres</label>
-            <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} required />
+            <label htmlFor="Nombres">Nombres</label>
+            <input type="text" name="Nombres" className="form-control" value={cliente.Nombres} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="lastName">Apellidos</label>
-            <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} required />
+            <label htmlFor="Apellidos">Apellidos</label>
+            <input type="text" name="Apellidos" className="form-control" value={cliente.Apellidos} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="address">Dirección</label>
-            <input type="text" name="address" className="form-control" value={formData.address} onChange={handleChange} required />
+            <label htmlFor="Direccion">Dirección</label>
+            <input type="text" name="Direccion" className="form-control" value={cliente.Direccion} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="birthDate">Fecha de Nacimiento</label>
-            <input type="date" name="birthDate" className="form-control" value={formData.birthDate} onChange={handleChange} required />
+            <label htmlFor="FechaNacimiento">Fecha de Nacimiento</label>
+            <input type="date" name="FechaNacimiento" className="form-control" value={cliente.FechaNacimiento} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label>Género</label>
             <div>
               <label>
-                <input type="radio" name="gender" value="male" checked={formData.gender === 'male'} onChange={handleChange} /> Masculino
+                <input type="radio" name="Sexo" value="male" checked={cliente.Sexo === 'male'} onChange={handleChange} /> Masculino
               </label>
               <label>
-                <input type="radio" name="gender" value="female" checked={formData.gender === 'female'} onChange={handleChange} /> Femenino
+                <input type="radio" name="Sexo" value="female" checked={cliente.Sexo === 'female'} onChange={handleChange} /> Femenino
               </label>
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="dni">DNI</label>
-            <input type="text" name="dni" className="form-control" value={formData.dni} onChange={handleChange} required />
+            <input type="text" name="dni" className="form-control" value={cliente.dni} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label htmlFor="telefono">Teléfono</label>
-            <input type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} required />
+            <input type="text" name="telefono" className="form-control" value={cliente.telefono} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="email">Correo electrónico</label>
-            <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
+            <label htmlFor="correo">Correo electrónico</label>
+            <input type="email" name="correo" className="form-control" value={cliente.correo} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input type="password" name="password" className="form-control" value={formData.password} onChange={handleChange} required />
+            <label htmlFor="Password">Contraseña</label>
+            <input type="password" name="Password" className="form-control" value={cliente.Password} onChange={handleChange} required />
           </div>
           <div className="form-group form-check">
-            <input type="checkbox" name="termsAccepted" checked={formData.termsAccepted} onChange={handleChange} />
+            <input type="checkbox" name="termsAccepted" checked={cliente.termsAccepted} onChange={handleChange} />
             <label>Acepto los términos y condiciones</label>
           </div>
           <button type="button" onClick={handleSubmit} className="btn btn-primary">Registrarse</button>

@@ -1,54 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import { apiFetch } from '../api'; // Asegúrate de que esta ruta sea correcta
 
 const VerMisPedidos: React.FC = () => {
-  return (
-    <div className='containerr'>
-      {/* Navbar reutilizable */}
-      <Header />
+    const [ventas, setVentas] = useState<any[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
-      <div className="container mt-5">
-        <h2 style={{ marginBottom: '50px', marginTop: '100px' }}>Mis Pedidos</h2>
-        <div className="card mb-3">
-          <div className="card-body">
-            <div className="row" style={{ alignItems: 'center' }}>
-              <div className="col-md-2">
-                <img src="https://grupo-lp2-cibertec-2024-i.github.io/proyecto-carrito/imagenes/Teclado%20Mec%C3%A1nico%20Razer%20BlackWidow.JPG" className="img-fluid" alt="Producto" />
-              </div>
-              <div className="col-md-6">
-                <h5 className="card-title">Teclado Ryzer</h5>
-                <p className="card-text">Switch Red, RGB 100% | Cantidad: 1</p>
-                <p className="card-text">
-                  <small className="text-muted">Estado del Pedido: Entregado</small>
-                </p>
-              </div>
-              <div
-                className="col-md-4"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: '10px',
-                }}
-              >
-                <a className="btn btn-warning" href="/verDetallesPedido" role="button" style={{ width: '200px' }}>
-                  Ver más detalles
-                </a>
-                <button type="button" className="btn btn-success" style={{ width: '200px' }}>
-                  Volver a comprar
-                </button>
-              </div>
+    useEffect(() => {
+        const fetchPedidos = async () => {
+            try {
+                const data = await apiFetch('/api/Venta/mis-ventas', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (Array.isArray(data)) {
+                    setVentas(data);
+                    alert(`Número de ventas: ${data.length}`);
+                } else {
+                    alert('La respuesta no es una lista');
+                }
+
+            } catch (error) {
+                setError('Error al cargar las ventas');
+                console.error(error);
+            }
+        };
+
+        fetchPedidos();
+    }, []);
+
+    return (
+        <div className='containerr'>
+            <Header />
+            <div className="container mt-5">
+                <h2 style={{ marginBottom: '50px', marginTop: '100px' }}>Mis Pedidos</h2>
+
+                {error && <p className="text-danger">{error}</p>}
+
+                {ventas.length === 0 && !error ? (
+                    <p>No tienes pedidos aún.</p>
+                ) : (
+                    ventas.map((venta) => (
+                        <div className="card mb-3" key={venta.idVenta}>
+                            <div className="card-body">
+                                <h5 className="card-title">Venta #{venta.idVenta}</h5>
+                                <p className="card-text">Monto: S/ {venta.monto}</p>
+                                <p className="card-text">Fecha: {venta.fechaVenta}</p>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
-          </div>
+            <Footer />
         </div>
-      </div>
-
-      {/* Footer reutilizable */}
-      <Footer />
-    </div>
-  );
+    );
 };
 
 export default VerMisPedidos;
