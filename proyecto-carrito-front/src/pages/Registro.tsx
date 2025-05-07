@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/Registro.css';
+import { publicFetch } from '../api';
 
 const Registro: React.FC = () => {
   const [cliente, setCliente] = useState({
@@ -45,8 +46,8 @@ const Registro: React.FC = () => {
     };
 
     try {
-      const response = await fetch(
-          "https://backend-ecommerce-t9cg.onrender.com/Cliente/add",
+      const response = await publicFetch(
+          "/api/Cliente/add",
           {
             method: "POST",
             headers: {
