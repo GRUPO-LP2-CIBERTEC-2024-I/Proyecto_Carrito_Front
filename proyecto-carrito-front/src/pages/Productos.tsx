@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
 import '../styles/Productos.css';
 import { useRef } from "react";
-import { apiFetch } from '../api';
+import { apiFetch, publicFetch } from '../api';
 
 
 // Interfaces para tipado
@@ -90,7 +90,7 @@ const Productos: React.FC = () => {
         url += `&categoria=${categoria}`;
       }
 
-      const data = await apiFetch(url);     
+      const data = await publicFetch(url);     
       setPaginatedData(data);
       setAllProductos(data.content);
 

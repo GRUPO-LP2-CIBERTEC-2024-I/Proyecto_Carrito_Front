@@ -16,10 +16,10 @@ const Comprar: React.FC = () => {
   const [nombreReceptor, setNombreReceptor] = useState('');
   const [referencia, setReferencia] = useState('');
   const [telefono, setTelefono] = useState('');
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated ,loading} = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading &&!isAuthenticated) {
       Swal.fire({
         title: "Acceso denegado",
         text: "Debes iniciar sesión para realizar una compra",
@@ -76,7 +76,7 @@ const Comprar: React.FC = () => {
           confirmButtonText: "OK",
         });
         // Redirigir al enlace de MercadoPago
-        window.location.href = data.init_point;
+        window.open(data.init_point, '_blank');
       } else {
         throw new Error("No se recibió el enlace de redirección.");
       }
