@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
 import '../styles/Productos.css';
 import { useRef } from "react";
+import { apiFetch } from '../api';
 
 
 // Interfaces para tipado
@@ -89,14 +90,7 @@ const Productos: React.FC = () => {
         url += `&categoria=${categoria}`;
       }
 
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Error al obtener los productos: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
+      const data = await apiFetch(url);     
       setPaginatedData(data);
       setAllProductos(data.content);
 

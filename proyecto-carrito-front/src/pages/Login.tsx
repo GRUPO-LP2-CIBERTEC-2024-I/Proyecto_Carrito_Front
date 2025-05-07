@@ -21,13 +21,14 @@ const Login: React.FC = () => {
         },
         credentials: 'include',
         body: JSON.stringify({
-          username: email,
+          correo: email,
           password: password
         })
       });
 
       if (response.ok) {
-        // Puedes guardar el token aquí si el backend lo devuelve
+        const data = await response.json();
+        localStorage.setItem("token", data.token); 
         login(email);
         navigate('/'); // Redirigir al Home
       } else {

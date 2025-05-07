@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import '../styles/Comprar.css';
+import { apiFetch } from '../api';
 
 const Comprar: React.FC = () => {
   const { cartItems, total, clearCart } = useCart(); // Obtén los productos del carrito y el total
@@ -34,7 +35,7 @@ const Comprar: React.FC = () => {
     }
     const body = {
       ventaDTO: {
-        fechaVenta: "12/05/24", // Fecha fija por ahora
+        fechaVenta: new Date(), // Fecha fija por ahora
         cli: "jhon2226g@gmail.com", // Cliente fijo por ahora
       },
       detallesDTO: cartItems.map((item) => ({
@@ -51,23 +52,19 @@ const Comprar: React.FC = () => {
     };
 
     try {
-      const response = await fetch(
-        "https://backend-ecommerce-t9cg.onrender.com/pago/crear-preferencia",
+      const response = await apiFetch(
+        "/api/pago/crear-preferencia",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
           body: JSON.stringify(body),
+          credentials: "include"
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`Error en la solicitud: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const data = await response;
       console.log("Respuesta del servidor:", data);
 
       if (data.init_point) {
